@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
 
       - name: Build the tagged Docker image dev for client
         run: docker build ./client --file ./client/Dockerfile.dev --tag hagli8/react-test
@@ -37,5 +37,5 @@ jobs:
           chmod +x ./.github/workflows/scripts/deploy.sh
           ./.github/workflows/scripts/deploy.sh
         env:
-          SHORT_SHA: ${{ steps.githash.outputs.shortsha }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SHORT_SHA: ${{ steps.githash.outputs.shortsha }}
