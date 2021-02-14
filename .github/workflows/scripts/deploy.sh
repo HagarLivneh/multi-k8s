@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 docker build -t hagli8/multi-client:latest -t hagli8/multi-client:$SHA -f ./client/Dockerfile ./client
 docker build -t hagli8/multi-server:latest -t hagli8/multi-server:$SHA -f ./server/Dockerfile ./server
 docker build -t hagli8/multi-worker:latest -t hagli8/multi-worker:$SHA -f ./worker/Dockerfile ./worker
