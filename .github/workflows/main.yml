@@ -33,9 +33,6 @@ jobs:
         run: echo "::set-output name=shortsha::$(echo ${GITHUB_SHA::7})"
 
       - name: Create deployment
-        run: |
-          chmod +x ./.github/workflows/scripts/deploy.sh
-          ./.github/workflows/scripts/deploy.sh
+        run: bash ./scripts/deploy.sh
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SHORT_SHA: ${{ steps.githash.outputs.shortsha }}
+          SHA: ${{ steps.githash.outputs.shortsha }}
