@@ -22,35 +22,19 @@ jobs:
     needs: [ci]
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@master
-        
-      - name: Build the tagged Docker image prod for client
-        run: docker build ./client --tag hagli8/multi-client
-
-      - name: Build the tagged Docker image prod for nginx
-        run: docker build ./nginx --tag hagli8/multi-nginx
-
-      - name: Build the tagged Docker image prod for server
-        run: docker build ./server --tag hagli8/multi-server
-
-      - name: Build the tagged Docker image prod for worker
-        run: docker build ./worker --tag hagli8/multi-worker
-
       - name: Login to DockerHub
         uses: docker/login-action@v1 
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Push client image to Docker Hub
-        run: docker push hagli8/multi-client
+     - name: Get short SHA
+        id: githash
+        run: echo "::set-output name=shortsha::$(echo ${GITHUB_SHA::7})"
 
-      - name: Push nginx image to Docker Hub
-        run: docker push hagli8/multi-nginx
-
-      - name: Push server image to Docker Hub
-        run: docker push hagli8/multi-server
-
-      - name: Push worker image to Docker Hub
-        run: docker push hagli8/multi-worker
+      - name: Create deployment
+        run: |
+          chmod +x ./.github/workflows/scripts/deploy.sh
+          ./.github/workflows/scripts/deploy.sh
+        env:
+          SHORT_SHA: ${{ steps.githash.outputs.shortsha }}
