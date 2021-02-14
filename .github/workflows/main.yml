@@ -1,0 +1,95 @@
+name: Build images and push to Docker Hub
+
+on: 
+  push:
+      branches: 
+        - master
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Build the tagged Docker image dev for client
+        run: docker build ./client --file ./client/Dockerfile.dev --tag hagli8/react-test
+      
+      - name: Run tests
+        run: docker run hagli8/react-test npm test
+  cd:
+    runs-on: ubuntu-latest
+    needs: [ci]
+
+    steps:
+      - name: Build the tagged Docker image prod for client
+        run: docker build ./client --tag hagli8/multi-client
+
+      - name: Build the tagged Docker image prod for nginx
+        run: docker build ./nginx --tag hagli8/multi-nginx
+
+      - name: Build the tagged Docker image prod for server
+        run: docker build ./server --tag hagli8/multi-server
+
+      - name: Build the tagged Docker image prod for worker
+        run: docker build ./worker --tag hagli8/multi-worker
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1 
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Push client image to Docker Hub
+        run: docker push hagli8/multi-client
+
+      - name: Push nginx image to Docker Hub
+        run: docker push hagli8/multi-nginx
+
+      - name: Push server image to Docker Hub
+        run: docker push hagli8/multi-server
+        
+      - name: Push worker image to Docker Hub
+        run: docker push hagli8/multi-worker
+
+
+
+
+
+name: Backend Chat CI/CD
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    container:
+      image: node
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install & Tests
+        run: |
+          npm install
+          npm test
+  cd:
+    runs-on: ubuntu-latest
+    needs: [ci]
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Docker login
+        run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build
+        run: docker build -t back .
+      - name: Tags
+        run: |
+          docker tag back ${{ secrets.DOCKER_USER }}/back:${{ github.sha }}
+          docker tag back ${{ secrets.DOCKER_USER }}/back:latest
+      - name: Push
+        run: |
+          docker push ${{ secrets.DOCKER_USER }}/back:${{ github.sha }}
+          docker push ${{ secrets.DOCKER_USER }}/back:latest
