@@ -27,7 +27,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
-          
+
       - name: Get short SHA
         id: githash
         run: echo "::set-output name=shortsha::$(echo ${GITHUB_SHA::7})"
@@ -38,3 +38,4 @@ jobs:
           ./.github/workflows/scripts/deploy.sh
         env:
           SHORT_SHA: ${{ steps.githash.outputs.shortsha }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
