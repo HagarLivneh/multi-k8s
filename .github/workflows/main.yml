@@ -27,8 +27,8 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
-
-     - name: Get short SHA
+          
+      - name: Get short SHA
         id: githash
         run: echo "::set-output name=shortsha::$(echo ${GITHUB_SHA::7})"
 
